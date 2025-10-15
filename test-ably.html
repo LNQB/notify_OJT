@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Ably In-App Notification</title>
+  <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+</head>
+<body>
+  <h2>🧠 Test Realtime Notification</h2>
+  <pre id="log"></pre>
+
+  <script>
+    const userId = prompt("Nhập userId (UUID) của bạn:");
+
+    // Kết nối đến Ably bằng token từ server NestJS
+    const ably = new Ably.Realtime({
+      authUrl: 'http://localhost:3000/ably/token'
+    });
+
+    const log = (msg) => {
+      document.getElementById('log').textContent += msg + "\n";
+    };
+
+    ably.connection.once('connected', () => {
+      log('✅ Đã kết nối Ably Realtime');
+      const channelName = `user:${userId}:notifications`;
+      const channel = ably.channels.get(channelName);
+      log(`📡 Subscribed channel: ${channelName}`);
+
+      channel.subscribe('notification.created', (message) => {
+        log(`📨 New Notification:\n${JSON.stringify(message.data, null, 2)}\n`);
+      });
+    });
+  </script>
+</body>
+</html>

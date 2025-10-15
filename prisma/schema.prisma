@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,7 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* ======================= Enums ======================= */
+/**
+ * ======================= Enums =======================
+ */
 enum NotifChannel {
   IN_APP
   EMAIL
@@ -22,15 +23,17 @@ enum DeliverStatus {
   failed
 }
 
-/* ======================= Models ======================= */
+/**
+ * ======================= Models =======================
+ */
 
 model User {
-  id            String   @id @default(uuid())
-  dateCreated   DateTime @default(now())
-  dateUpdated   DateTime @updatedAt
-  username      String   @unique
-  email         String   @unique
-  status        String   @default("active")
+  id          String   @id @default(uuid())
+  dateCreated DateTime @default(now())
+  dateUpdated DateTime @updatedAt
+  username    String   @unique
+  email       String   @unique
+  status      String   @default("active")
 
   notificationRecipients NotificationRecipient[]
 }
@@ -48,32 +51,31 @@ model NotificationTemplate {
 }
 
 model Notification {
-  id          String        @id @default(uuid())
+  id          String   @id @default(uuid())
   senderId    String?
   templateId  String?
   subject     String?
   body        String?
   data        Json?
   category    String?
-  priority    Int?          @default(0)
+  priority    Int?     @default(0)
   sourceEvent String?
   dedupKey    String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  template    NotificationTemplate? @relation(fields: [templateId], references: [id])
-  recipients  NotificationRecipient[]
+  template   NotificationTemplate?   @relation(fields: [templateId], references: [id])
+  recipients NotificationRecipient[]
 }
 
 model NotificationRecipient {
-  id             String         @id @default(uuid())
+  id             String        @id @default(uuid())
   notificationId String
   userId         String?
   toAddress      String?
-  status         DeliverStatus  @default(queued)
-  createdAt      DateTime       @default(now())
+  status         DeliverStatus @default(queued)
+  createdAt      DateTime      @default(now())
 
   notification Notification @relation(fields: [notificationId], references: [id])
   user         User?        @relation(fields: [userId], references: [id])
 }
-
